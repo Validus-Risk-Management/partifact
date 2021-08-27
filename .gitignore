@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+.Python
+build/
+develop-eggs/
+
+.pytest_cache/
+
+__pypackages__/
+
+.venv
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+.idea/

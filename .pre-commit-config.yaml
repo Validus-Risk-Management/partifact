@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+  - repo: https://github.com/psf/black
+    rev: 21.7b0
+    hooks:
+      - id: black
+        name: "Format with black"
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.9.3
+    hooks:
+      - id: isort
+        name: "Sort module imports"
+        args: ["--profile", "black", "--filter-files"]
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-absolute-import
+          - flake8-blind-except
+          - flake8-breakpoint
+          - flake8-bugbear
+          - flake8-builtins
+          - flake8-cognitive-complexity
+          - flake8-comprehensions
+          - flake8-docstrings
+          - flake8-eradicate
+          - flake8-implicit-str-concat
+          - flake8-mutable
+          - flake8-print
+          - flake8-pytest-style
+          - flake8-simplify
+          - pep8-naming
+        args: ["--config=.flake8"]

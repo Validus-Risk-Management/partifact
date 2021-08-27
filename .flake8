@@ -1,0 +1,7 @@
+[flake8]
+extend-ignore = E203,E501,D100,SIM106
+
+exclude = .git,__pycache__,__init__.py,.mypy_cache,.pytest_cache,.venv
+# We don't require module level docstrings for tests:
+per-file-ignores = tests/*:D100,D101
+docstring-convention = google
