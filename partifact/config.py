@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import configparser
 from dataclasses import Field, dataclass, fields
-from os.path import expanduser
+from tomlkit import parse
+from tomlkit.exceptions import TOMLKitError
 from typing import Optional
 
-CONFIG_PATH = "~/.config/partifact/partifact.conf"
+CONFIG_PATH = "./pyproject.toml"
 
 
 @dataclass
@@ -39,16 +39,21 @@ class Configuration:
             repository (str): The name of the section in the configuration file,
                 which should match the name of the poetry repository.
         """
-        config = configparser.ConfigParser()
-        config.read(expanduser(CONFIG_PATH))
+        try:
+            with open(CONFIG_PATH, "r") as f:
+                config = parse(f.read())
+        except FileNotFoundError:
+            raise MissingConfiguration("no pyproject.toml found")
+        except TOMLKitError:
+            raise MissingConfiguration("invalid pyproject.toml")
 
         try:
-            repo = config[repository]
-        except KeyError:
+            repo = config["tool"]["partifact"]["repository"][repository]  # type: ignore
+        except TOMLKitError:
             raise MissingConfiguration(f"no configuration found for {repository}")
 
         def validate_field(field: Field) -> bool:
-            return "Optional" in field.type or field.name in repo
+            return "Optional" in field.type or field.name in repo  # type: ignore
 
         missing_fields = [
             field.name for field in fields(cls) if not validate_field(field)
@@ -56,7 +61,7 @@ class Configuration:
         if missing_fields:
             raise IncompleteConfiguration(f"missing fields in config: {missing_fields}")
 
-        return Configuration(**repo)
+        return Configuration(**repo)  # type: ignore
 
 
 class MissingConfiguration(Exception):

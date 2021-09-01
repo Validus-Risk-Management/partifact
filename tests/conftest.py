@@ -1,37 +1,20 @@
-import configparser
-import os
 from dataclasses import asdict
 
 import pytest
+import tomlkit
 
-from partifact.config import Configuration
-
-
-@pytest.fixture()
-def expanduser(mocker):
-    """Fixture to mock os.path.expanduser."""
-
-    def mock_expanduser(path):
-        return path.replace("~", "/home/test_user")
-
-    mock = mocker.patch("partifact.config.expanduser")
-    mock.side_effect = mock_expanduser
-    return mock_expanduser
+from partifact.config import Configuration, CONFIG_PATH
 
 
 @pytest.fixture()
-def write_conf(expanduser, fs):
+def write_conf(fs):
     """Fixture to write a configuration entry."""
-    from partifact.config import CONFIG_PATH
 
     def _write(repository: str, **kwargs):
-        config = configparser.ConfigParser()
-        config[repository] = kwargs
+        config = {"tool": {"partifact": {"repository": {repository: kwargs}}}}
 
-        path = expanduser(CONFIG_PATH)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
-            config.write(f)
+        with open(CONFIG_PATH, "w") as f:
+            f.write(tomlkit.dumps(config))
 
     return _write
 
