@@ -30,7 +30,7 @@ For now, however, add the following to the file manually:
 [tool.partifact.repository.POETRY_REPOSITORY_NAME]
 code_artifact_account = "your-aws-account-hosting-codeartifact"
 code_artifact_domain = "your-domain-name"
-code_artifact_repository = "your-codeartifact-repository"  # no the same as the Poetry repository
+code_artifact_repository = "your-codeartifact-repository"  # not the same as the Poetry repository
 aws_profile = "your-aws-profile"  # optional
 aws_role_arn = "an-aws-role-to-assume"  # optional
 ```
