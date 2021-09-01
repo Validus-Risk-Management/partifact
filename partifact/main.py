@@ -2,6 +2,7 @@ import typer
 
 from partifact.auth_token import get_token
 from partifact.config import Configuration
+from partifact.shell_commands import configure_pip, configure_poetry
 
 app = typer.Typer()
 
@@ -15,7 +16,8 @@ def login(repository: str):
     config = Configuration.load(repository)
     token = get_token(config)
 
-    typer.echo(token)
+    configure_pip(config, token)
+    configure_poetry(repository, token)
 
 
 @app.command()

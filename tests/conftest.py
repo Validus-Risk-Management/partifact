@@ -142,3 +142,10 @@ def aws(mocker):
     mock = mocker.patch("boto3.Session")
     mock.side_effect = dummy_aws.new_session
     return dummy_aws
+
+
+@pytest.fixture()
+def subprocess_mock(mocker):
+    """Patches subprocess.run so that it does not execute anything."""
+    mock = mocker.patch("subprocess.run")
+    return mock
