@@ -53,7 +53,6 @@ def test_config_with_role_arn(write_conf):
     assert conf.aws_role_arn == role_arn
 
 
-@pytest.mark.usefixtures("write_conf")
 def test_missing_config_file():
     """Test that an appropriate exception is raised when the config file is missing."""
     with pytest.raises(MissingConfiguration, match=r"no configuration .*"):

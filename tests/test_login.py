@@ -33,8 +33,9 @@ def token_mock(mocker):
     return mock
 
 
+@pytest.mark.usefixtures("subprocess_mock")
 def test_login_generates_token_with_correct_inputs(
-    subprocess_mock: Mock, load_config_mock: Mock, token_mock: Mock
+    load_config_mock: Mock, token_mock: Mock
 ):
     """Tests that the login command generates the token with correct inputs."""
     test_poetry_repo = "TEST_POETRY_REPO"
