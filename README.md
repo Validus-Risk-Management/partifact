@@ -1,6 +1,6 @@
-# pArtifact
+# partifact
 
-pArtifact is a tool to help with configuring and authenticating CodeArtifact as a repository for [Poetry](https://github.com/python-poetry/poetry) and [pip](https://pip.pypa.io/en/stable/).
+partifact is a tool to help with configuring and authenticating CodeArtifact as a repository for [Poetry](https://github.com/python-poetry/poetry) and [pip](https://pip.pypa.io/en/stable/).
 
 [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/codeartifact/login.html) offers functionality to configure CodeArtifact for pip.
 This tool offers the following improvements over the CLI:
@@ -12,7 +12,7 @@ This tool offers the following improvements over the CLI:
 
 # How to use?
 
-Install pArtifact from pypi using pip the usual way:
+Install partifact from pypi using pip the usual way:
 
 ```shell
 pip install partifact
@@ -20,41 +20,25 @@ pip install partifact
 
 It's best to do this globally, rather than inside the virtualenv.
 
-Before you can use pArtifact, you need to configure it for your project
-in the `pyproject.toml` file.
-
-In the future, this will be done via a configuration tool.
-For now, however, add the following to the file manually:
-
-```toml
-[tool.partifact.repository.POETRY_REPOSITORY_NAME]
-code_artifact_account = "your-aws-account-hosting-codeartifact"
-code_artifact_domain = "your-domain-name"
-code_artifact_repository = "your-codeartifact-repository"  # not the same as the Poetry repository
-```
-
-Replace `POETRY_REPOSITORY_NAME` with your Poetry repository name. E.g. for the following
-Poetry configuration:
+Before you can use partifact, the Poetry source repository needs to be
+[configured](https://python-poetry.org/docs/pyproject/#dependencies-and-dev-dependencies)
+in `pyproject.toml`.
 
 ```toml
 [[tool.poetry.source]]
-name = "myrepo"
-url = "https://myrepo-codeartifact-url"
+name = "my-repo"
+url = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}/simple/"
+default = true  # if this should be the default repository to install from
 ```
 
-`POETRY_REPOSITORY_NAME` should be set to "myrepo".
-
-The configuration entries are:
-1. `code_artifact_account`: The account hosting the CodeArtifact repository.
-2. `code_artifact_domain`: The [CodeArtifact domain](https://docs.aws.amazon.com/codeartifact/latest/ug/domains.html).
-3. `code_artifact_repository`: The [CodeArtifact repository](https://docs.aws.amazon.com/codeartifact/latest/ug/repos.html).
-
-Once everything is configured, you can log into CodeArtifact using the
-pArtifact login command:
+Once Poetry is configured, you can use the partifact command to authenticate:
 
 ```shell
-partifact login [POETRY_REPOSITORY_NAME]
+partifact login my-repo
 ```
+
+> **NOTE**: Make sure your run the command from the directory where your `pyproject.toml` is!
+
 
 Optionally, you can pass in an AWS profile and/or AWS role to use
 for CodeArtifact token generation.
