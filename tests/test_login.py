@@ -1,6 +1,7 @@
+from unittest.mock import Mock
+
 import pytest
 from typer.testing import CliRunner
-from unittest.mock import Mock
 
 from partifact.config import Configuration
 from partifact.main import app
@@ -43,7 +44,39 @@ def test_login_generates_token_with_correct_inputs(
     result = runner.invoke(app, ["login", test_poetry_repo])
     assert result.exit_code == 0
 
-    load_config_mock.assert_called_once_with(test_poetry_repo)
+    load_config_mock.assert_called_once_with(test_poetry_repo, None, None)
+    config: Configuration = load_config_mock.return_value
+    token_mock.assert_called_once_with(config)
+
+
+@pytest.mark.usefixtures("subprocess_mock")
+def test_login_generates_token_with_correct_inputs_with_profile(
+    load_config_mock: Mock, token_mock: Mock
+):
+    """Tests that the login command generates the token with correct inputs."""
+    test_poetry_repo = "TEST_POETRY_REPO"
+    test_profile = "test-profile"
+
+    result = runner.invoke(app, ["login", test_poetry_repo, "--profile", test_profile])
+    assert result.exit_code == 0
+
+    load_config_mock.assert_called_once_with(test_poetry_repo, test_profile, None)
+    config: Configuration = load_config_mock.return_value
+    token_mock.assert_called_once_with(config)
+
+
+@pytest.mark.usefixtures("subprocess_mock")
+def test_login_generates_token_with_correct_inputs_with_role(
+    load_config_mock: Mock, token_mock: Mock
+):
+    """Tests that the login command generates the token with correct inputs."""
+    test_poetry_repo = "TEST_POETRY_REPO"
+    test_role = "test-role"
+
+    result = runner.invoke(app, ["login", test_poetry_repo, "--role", test_role])
+    assert result.exit_code == 0
+
+    load_config_mock.assert_called_once_with(test_poetry_repo, None, test_role)
     config: Configuration = load_config_mock.return_value
     token_mock.assert_called_once_with(config)
 

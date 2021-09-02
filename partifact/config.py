@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import Field, dataclass, fields
+from typing import Optional
+
 from tomlkit import parse
 from tomlkit.exceptions import TOMLKitError
-from typing import Optional
 
 CONFIG_PATH = "./pyproject.toml"
 
 
-@dataclass
+@dataclass(frozen=True)
 class Configuration:
     """Data for a repository entry in the config file.
 
@@ -29,15 +30,22 @@ class Configuration:
     code_artifact_domain: str
     code_artifact_repository: str
     aws_profile: Optional[str] = None
-    aws_role_arn: Optional[str] = None
+    aws_role_name: Optional[str] = None
 
     @classmethod
-    def load(cls, repository: str) -> Configuration:
+    def load(
+        cls,
+        repository: str,
+        profile: Optional[str] = None,
+        role_name: Optional[str] = None,
+    ) -> Configuration:
         """Loads the configuration for the supplied repository.
 
         Args:
             repository (str): The name of the section in the configuration file,
                 which should match the name of the poetry repository.
+            profile (Optional[str]): The AWS profile to use.
+            role_name (Optional[str]): The name of the AWS role to use.
         """
         try:
             with open(CONFIG_PATH, "r") as f:
@@ -61,7 +69,7 @@ class Configuration:
         if missing_fields:
             raise IncompleteConfiguration(f"missing fields in config: {missing_fields}")
 
-        return Configuration(**repo)  # type: ignore
+        return Configuration(aws_profile=profile, aws_role_name=role_name, **repo)  # type: ignore
 
 
 class MissingConfiguration(Exception):

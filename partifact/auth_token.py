@@ -2,6 +2,8 @@ import boto3
 
 from partifact.config import Configuration
 
+AWS_ROLE_TEMPLATE = "arn:aws:iam::{account}:role/{role_name}"
+
 
 def get_token(configuration: Configuration) -> str:
     """Returns a valid CodeArtifact token.
@@ -14,8 +16,12 @@ def get_token(configuration: Configuration) -> str:
     """
     session = boto3.Session(profile_name=configuration.aws_profile)
 
-    if configuration.aws_role_arn:
-        session = _assume_role(session, configuration.aws_role_arn)
+    if configuration.aws_role_name:
+        role_arn = AWS_ROLE_TEMPLATE.format(
+            account=configuration.code_artifact_account,
+            role_name=configuration.aws_role_name,
+        )
+        session = _assume_role(session, role_arn)
 
     client = session.client("codeartifact")
     response = client.get_authorization_token(

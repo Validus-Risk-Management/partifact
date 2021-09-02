@@ -51,7 +51,7 @@ def test_token_via_assumed_role(aws):
         code_artifact_account="1234",
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
-        aws_role_arn="test-role-arn",
+        aws_role_name="test-role",
     )
 
     aws.add_repository(
@@ -61,7 +61,7 @@ def test_token_via_assumed_role(aws):
     actual_token = get_token(conf)
 
     assert actual_token == expected_token
-    assert aws.assumed_role == conf.aws_role_arn
+    assert aws.assumed_role == "arn:aws:iam::1234:role/test-role"
     assert len(aws.sessions) == 2
     assert aws.sessions[0].kwargs["profile_name"] is None
 
@@ -74,7 +74,7 @@ def test_token_via_named_profile_assumed_role(aws):
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
         aws_profile="test-profile",
-        aws_role_arn="test-role-arn",
+        aws_role_name="test-role",
     )
 
     aws.add_repository(
@@ -84,6 +84,6 @@ def test_token_via_named_profile_assumed_role(aws):
     actual_token = get_token(conf)
 
     assert actual_token == expected_token
-    assert aws.assumed_role == conf.aws_role_arn
+    assert aws.assumed_role == "arn:aws:iam::1234:role/test-role"
     assert len(aws.sessions) == 2
     assert aws.sessions[0].kwargs["profile_name"] == conf.aws_profile

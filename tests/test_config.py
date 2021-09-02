@@ -21,7 +21,7 @@ def test_config_with_mandatory_fields(write_conf):
     assert conf.code_artifact_domain == "test_domain"
     assert conf.code_artifact_repository == "test_ca_repo"
     assert conf.aws_profile is None
-    assert conf.aws_role_arn is None
+    assert conf.aws_role_name is None
 
 
 def test_config_with_aws_profile(write_conf):
@@ -31,26 +31,24 @@ def test_config_with_aws_profile(write_conf):
         code_artifact_account="123456789",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_ca_repo",
-        aws_profile="dummy_profile",
     )
-    conf = Configuration.load("test_repo")
+    conf = Configuration.load("test_repo", profile="dummy_profile")
 
     assert conf.aws_profile == "dummy_profile"
 
 
-def test_config_with_role_arn(write_conf):
+def test_config_with_role(write_conf):
     """Test that the AWS role ARN is overridden with the value in config."""
-    role_arn = "arn:aws:iam::123456789:role/test_role"
+    role_name = "test_role"
     write_conf(
         "test_repo",
         code_artifact_account="123456789",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_ca_repo",
-        aws_role_arn=role_arn,
     )
-    conf = Configuration.load("test_repo")
+    conf = Configuration.load("test_repo", role_name=role_name)
 
-    assert conf.aws_role_arn == role_arn
+    assert conf.aws_role_name == role_name
 
 
 def test_missing_config_file():
