@@ -31,8 +31,6 @@ For now, however, add the following to the file manually:
 code_artifact_account = "your-aws-account-hosting-codeartifact"
 code_artifact_domain = "your-domain-name"
 code_artifact_repository = "your-codeartifact-repository"  # not the same as the Poetry repository
-aws_profile = "your-aws-profile"  # optional
-aws_role_arn = "an-aws-role-to-assume"  # optional
 ```
 
 Replace `POETRY_REPOSITORY_NAME` with your Poetry repository name. E.g. for the following
@@ -50,15 +48,18 @@ The configuration entries are:
 1. `code_artifact_account`: The account hosting the CodeArtifact repository.
 2. `code_artifact_domain`: The [CodeArtifact domain](https://docs.aws.amazon.com/codeartifact/latest/ug/domains.html).
 3. `code_artifact_repository`: The [CodeArtifact repository](https://docs.aws.amazon.com/codeartifact/latest/ug/repos.html).
-4. `aws_profile` (optional): Use a non-default AWS profile to get the CodeArtifact token.
-5. `aws_role_arn` (optional): Assume and use this AWS role to get the CodeArtifact token.
-This is useful in deployment pipelines, where ENV variables are used for the AWS
-access key and secret key and the keys are for the account it's deploying the application
-in, rather than the CodeArtifact account.
 
 Once everything is configured, you can log into CodeArtifact using the
 pArtifact login command:
 
 ```shell
 partifact login [POETRY_REPOSITORY_NAME]
+```
+
+Optionally, you can pass in an AWS profile and/or AWS role to use
+for CodeArtifact token generation.
+
+```shell
+partifact login myrepo --profile myprofile
+partifact login myrepo --role myrole
 ```
