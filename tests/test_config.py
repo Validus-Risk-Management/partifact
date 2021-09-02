@@ -1,8 +1,10 @@
 import pytest
+import tomlkit
 
 from partifact.config import (
+    CONFIG_PATH,
     Configuration,
-    IncompleteConfiguration,
+    InvalidConfiguration,
     MissingConfiguration,
 )
 
@@ -11,13 +13,15 @@ def test_config_with_mandatory_fields(write_conf):
     """Test that a config entry with all fields defined is successfully parsed."""
     write_conf(
         "test_repo",
-        code_artifact_account="123456789",
+        aws_account="123456789",
+        aws_region="eu-west-1",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_ca_repo",
     )
     conf = Configuration.load("test_repo")
 
-    assert conf.code_artifact_account == "123456789"
+    assert conf.aws_account == "123456789"
+    assert conf.aws_region == "eu-west-1"
     assert conf.code_artifact_domain == "test_domain"
     assert conf.code_artifact_repository == "test_ca_repo"
     assert conf.aws_profile is None
@@ -28,7 +32,8 @@ def test_config_with_aws_profile(write_conf):
     """Test that the AWS profile is overridden with the value in config."""
     write_conf(
         "test_repo",
-        code_artifact_account="123456789",
+        aws_account="123456789",
+        aws_region="eu-west-1",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_ca_repo",
     )
@@ -42,7 +47,8 @@ def test_config_with_role(write_conf):
     role_name = "test_role"
     write_conf(
         "test_repo",
-        code_artifact_account="123456789",
+        aws_account="123456789",
+        aws_region="eu-west-1",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_ca_repo",
     )
@@ -57,16 +63,17 @@ def test_missing_config_file():
         Configuration.load("test_repo")
 
 
-def test_missing_mandatory_field(write_conf):
-    """Test that an appropriate exception is raised when a mandatory field is missing."""
-    write_conf(
-        "test_repo",
-        code_artifact_account="123456789",
-        code_artifact_domain="test_domain",
-    )
+def test_incorrect_url_format(fs):
+    """Test that an appropriate exception is raised when the poetry URL is incorrect."""
+    repo_name = "test-repo"
+    sources = [{"url": "https://wrong-url", "name": repo_name}]
+    config = {"tool": {"poetry": {"source": sources}}}
+
+    with open(CONFIG_PATH, "w") as f:
+        f.write(tomlkit.dumps(config))
 
     with pytest.raises(
-        IncompleteConfiguration,
-        match=r"missing.*code_artifact_repository.*",
+        InvalidConfiguration,
+        match=r"failed to parse source URL.*",
     ):
-        Configuration.load("test_repo")
+        Configuration.load(repo_name)

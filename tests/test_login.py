@@ -13,7 +13,8 @@ runner = CliRunner()
 def load_config_mock(mocker) -> Mock:
     """Patches the load method of Configuration."""
     test_config = Configuration(
-        code_artifact_account="test_account",
+        aws_account="test_account",
+        aws_region="eu-west-1",
         code_artifact_domain="test_domain",
         code_artifact_repository="test_repo",
     )
@@ -90,7 +91,7 @@ def test_login_command_configures_pip(
 
     config: Configuration = load_config_mock.return_value
 
-    expected_pip_url = f"https://aws:{token_mock.return_value}@{config.code_artifact_domain}-{config.code_artifact_account}.d.codeartifact.eu-west-1.amazonaws.com/pypi/{config.code_artifact_repository}/simple/"
+    expected_pip_url = f"https://aws:{token_mock.return_value}@{config.code_artifact_domain}-{config.aws_account}.d.codeartifact.eu-west-1.amazonaws.com/pypi/{config.code_artifact_repository}/simple/"
     expected_pip_command = [
         "pip",
         "config",

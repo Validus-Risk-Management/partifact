@@ -6,13 +6,12 @@ def test_token_without_profile(aws):
     """Tests token generation without a named profile or role."""
     expected_token = "test-token"
     conf = Configuration(
-        code_artifact_account="1234",
+        aws_account="1234",
+        aws_region="eu-west-1",
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
     )
-    aws.add_repository(
-        conf.code_artifact_domain, conf.code_artifact_account, expected_token
-    )
+    aws.add_repository(conf.code_artifact_domain, conf.aws_account, expected_token)
 
     actual_token = get_token(conf)
 
@@ -26,15 +25,14 @@ def test_token_using_profile(aws):
     """Tests that a token is returned as expected when authenticating via a named profile."""
     expected_token = "test-token"
     conf = Configuration(
-        code_artifact_account="1234",
+        aws_account="1234",
+        aws_region="eu-west-1",
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
         aws_profile="test-profile",
     )
 
-    aws.add_repository(
-        conf.code_artifact_domain, conf.code_artifact_account, expected_token
-    )
+    aws.add_repository(conf.code_artifact_domain, conf.aws_account, expected_token)
 
     actual_token = get_token(conf)
 
@@ -48,15 +46,14 @@ def test_token_via_assumed_role(aws):
     """Tests that a token is returned as expected when authenticating via a role."""
     expected_token = "test-token"
     conf = Configuration(
-        code_artifact_account="1234",
+        aws_account="1234",
+        aws_region="eu-west-1",
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
         aws_role_name="test-role",
     )
 
-    aws.add_repository(
-        conf.code_artifact_domain, conf.code_artifact_account, expected_token
-    )
+    aws.add_repository(conf.code_artifact_domain, conf.aws_account, expected_token)
 
     actual_token = get_token(conf)
 
@@ -70,16 +67,15 @@ def test_token_via_named_profile_assumed_role(aws):
     """Tests token generation via assumed role from a named profile."""
     expected_token = "test-token"
     conf = Configuration(
-        code_artifact_account="1234",
+        aws_account="1234",
+        aws_region="eu-west-1",
         code_artifact_repository="test-repo",
         code_artifact_domain="test-domain",
         aws_profile="test-profile",
         aws_role_name="test-role",
     )
 
-    aws.add_repository(
-        conf.code_artifact_domain, conf.code_artifact_account, expected_token
-    )
+    aws.add_repository(conf.code_artifact_domain, conf.aws_account, expected_token)
 
     actual_token = get_token(conf)
 

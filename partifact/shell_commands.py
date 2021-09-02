@@ -6,7 +6,6 @@ from typing import Dict, List
 
 from partifact.config import Configuration
 
-
 PIP_COMMAND = [
     "pip",
     "config",
@@ -39,8 +38,8 @@ def configure_pip(config: Configuration, token: str) -> None:
         url = PIP_URL_TEMPLATE.format(
             token=token,
             domain=config.code_artifact_domain,
-            account=config.code_artifact_account,
-            region="eu-west-1",
+            account=config.aws_account,
+            region=config.aws_region,
             repo=config.code_artifact_repository,
         )
         _run_command(PIP_COMMAND, {"URL": url})

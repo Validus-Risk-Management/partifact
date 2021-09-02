@@ -18,7 +18,7 @@ def get_token(configuration: Configuration) -> str:
 
     if configuration.aws_role_name:
         role_arn = AWS_ROLE_TEMPLATE.format(
-            account=configuration.code_artifact_account,
+            account=configuration.aws_account,
             role_name=configuration.aws_role_name,
         )
         session = _assume_role(session, role_arn)
@@ -26,7 +26,7 @@ def get_token(configuration: Configuration) -> str:
     client = session.client("codeartifact")
     response = client.get_authorization_token(
         domain=configuration.code_artifact_domain,
-        domainOwner=configuration.code_artifact_account,
+        domainOwner=configuration.aws_account,
     )
     return response["authorizationToken"]
 

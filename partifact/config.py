@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import Field, dataclass, fields
+from dataclasses import dataclass
 from typing import Optional
 
-from tomlkit import parse
+from parse import parse
+from tomlkit import parse as parse_toml
 from tomlkit.exceptions import TOMLKitError
 
 CONFIG_PATH = "./pyproject.toml"
+URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}/simple/"
 
 
 @dataclass(frozen=True)
@@ -14,19 +16,22 @@ class Configuration:
     """Data for a repository entry in the config file.
 
     Attributes:
+        aws_account (str):
+            The AWS account hosting the CodeArtifact repository.
+        aws_region (str):
+            The AWS region of the CodeArtifact repository.
+        code_artifact_domain (str): The name of the CodeArtifact domain.
+        code_artifact_repository (str): The name of the CodeArtifact repository.
         aws_profile (str, optional):
             The AWS profile to use. If no profile is specified, the session
             will follow the resolution logic as boto3.
-        aws_role_arn (str, optional):
+        aws_role_name (str, optional):
             If specified, this role will be assumed to get the authorisation
             token.
-        code_artifact_account (str):
-            The AWS account hosting the CodeArtifact repository.
-        code_artifact_domain (str): The name of the CodeArtifact domain.
-        code_artifact_repository (str): The name of the CodeArtifact repository.
     """
 
-    code_artifact_account: str
+    aws_account: str
+    aws_region: str
     code_artifact_domain: str
     code_artifact_repository: str
     aws_profile: Optional[str] = None
@@ -49,27 +54,26 @@ class Configuration:
         """
         try:
             with open(CONFIG_PATH, "r") as f:
-                config = parse(f.read())
+                config = parse_toml(f.read())
         except FileNotFoundError:
             raise MissingConfiguration("no pyproject.toml found")
         except TOMLKitError:
             raise MissingConfiguration("invalid pyproject.toml")
 
         try:
-            repo = config["tool"]["partifact"]["repository"][repository]  # type: ignore
-        except TOMLKitError:
+            source = config["tool"]["poetry"]["source"]  # type: ignore
+            repo = next(s for s in source if s["name"] == repository)  # type: ignore
+            url = repo["url"]
+        except (TOMLKitError, StopIteration):
             raise MissingConfiguration(f"no configuration found for {repository}")
 
-        def validate_field(field: Field) -> bool:
-            return "Optional" in field.type or field.name in repo  # type: ignore
+        parsed_url = parse(URL_TEMPLATE, url)
+        if not parsed_url:
+            raise InvalidConfiguration(
+                f"failed to parse source URL, make sure it's in the format of {URL_TEMPLATE}"
+            )
 
-        missing_fields = [
-            field.name for field in fields(cls) if not validate_field(field)
-        ]
-        if missing_fields:
-            raise IncompleteConfiguration(f"missing fields in config: {missing_fields}")
-
-        return Configuration(aws_profile=profile, aws_role_name=role_name, **repo)  # type: ignore
+        return Configuration(aws_profile=profile, aws_role_name=role_name, **parsed_url.named)  # type: ignore
 
 
 class MissingConfiguration(Exception):
@@ -78,7 +82,7 @@ class MissingConfiguration(Exception):
     pass
 
 
-class IncompleteConfiguration(Exception):
+class InvalidConfiguration(Exception):
     """Raised if a key is missing from the repository's configuration."""
 
     pass

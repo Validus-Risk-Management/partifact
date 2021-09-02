@@ -3,7 +3,7 @@ from dataclasses import asdict
 import pytest
 import tomlkit
 
-from partifact.config import Configuration, CONFIG_PATH
+from partifact.config import CONFIG_PATH, URL_TEMPLATE, Configuration
 
 
 @pytest.fixture()
@@ -11,7 +11,9 @@ def write_conf(fs):
     """Fixture to write a configuration entry."""
 
     def _write(repository: str, **kwargs):
-        config = {"tool": {"partifact": {"repository": {repository: kwargs}}}}
+        url = URL_TEMPLATE.format(**kwargs)
+        sources = [{"url": url, "name": repository}]
+        config = {"tool": {"poetry": {"source": sources}}}
 
         with open(CONFIG_PATH, "w") as f:
             f.write(tomlkit.dumps(config))
