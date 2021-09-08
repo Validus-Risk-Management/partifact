@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "partifact"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["David Steiner <david_j_steiner@yahoo.co.nz>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/Validus-Risk-Management/partifact"
 
 [tool.poetry.scripts]
 partifact = "partifact.main:app"
