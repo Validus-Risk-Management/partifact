@@ -6,6 +6,7 @@ from partifact.config import (
     Configuration,
     InvalidConfiguration,
     MissingConfiguration,
+    parse_url,
 )
 
 
@@ -77,3 +78,23 @@ def test_incorrect_url_format(fs):
         match=r"failed to parse source URL.*",
     ):
         Configuration.load(repo_name)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://test_domain-123456789.d.codeartifact.eu-west-1.amazonaws.com/pypi/test_ca_repo",
+        "https://test_domain-123456789.d.codeartifact.eu-west-1.amazonaws.com/pypi/test_ca_repo/",
+        "https://test_domain-123456789.d.codeartifact.eu-west-1.amazonaws.com/pypi/test_ca_repo/simple",
+        "https://test_domain-123456789.d.codeartifact.eu-west-1.amazonaws.com/pypi/test_ca_repo/simple/",
+    ],
+)
+def test_parse_url(url):
+    actual = parse_url(url)
+    expected = {
+        "code_artifact_domain": "test_domain",
+        "code_artifact_repository": "test_ca_repo",
+        "aws_account": "123456789",
+        "aws_region": "eu-west-1",
+    }
+    assert actual == expected

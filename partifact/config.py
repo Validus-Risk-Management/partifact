@@ -8,7 +8,7 @@ from tomlkit import parse as parse_toml
 from tomlkit.exceptions import TOMLKitError
 
 CONFIG_PATH = "./pyproject.toml"
-URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}/simple/"
+URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
 
 
 @dataclass(frozen=True)
@@ -67,13 +67,25 @@ class Configuration:
         except (TOMLKitError, StopIteration):
             raise MissingConfiguration(f"no configuration found for {repository}")
 
-        parsed_url = parse(URL_TEMPLATE, url)
-        if not parsed_url:
-            raise InvalidConfiguration(
-                f"failed to parse source URL, make sure it's in the format of {URL_TEMPLATE}"
-            )
+        parsed_url = parse_url(url)
 
-        return Configuration(aws_profile=profile, aws_role_name=role_name, **parsed_url.named)  # type: ignore
+        return Configuration(aws_profile=profile, aws_role_name=role_name, **parsed_url)  # type: ignore
+
+
+def parse_url(url: str) -> dict:
+    """Parses the URL into a mapping of parameter names to values."""
+    result = parse(URL_TEMPLATE, url)
+    if not result:
+        raise InvalidConfiguration(
+            f"failed to parse source URL, make sure it's in the format of {URL_TEMPLATE}"
+        )
+
+    parsed_url = result.named
+    parsed_url["code_artifact_repository"] = (
+        parsed_url["code_artifact_repository"].replace("simple", "").rstrip("/")
+    )
+
+    return parsed_url
 
 
 class MissingConfiguration(Exception):
