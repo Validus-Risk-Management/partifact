@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -9,6 +10,12 @@ from tomlkit.exceptions import TOMLKitError
 
 CONFIG_PATH = "./pyproject.toml"
 URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
+# Regular expression pattern to parse the URL if a dash is detected in the normally parsed aws_account.
+# (?P<code_artifact_domain>(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)): matches the code_artifact_domain, allowing alphanumeric characters and dashes
+# (?P<aws_account>\d+): matches the aws_account, allowing one or more digits
+# (?P<aws_region>[a-z0-9-]+): matches the aws_region, allowing lowercase alphanumeric characters and dashes
+# (?P<code_artifact_repository>.*): matches the code_artifact_repository, allowing any character (except a newline)
+URL_PATTERN = r"https://(?P<code_artifact_domain>(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?))-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
 
 
 @dataclass(frozen=True)
@@ -84,6 +91,13 @@ def parse_url(url: str) -> dict:
     parsed_url["code_artifact_repository"] = (
         parsed_url["code_artifact_repository"].replace("simple", "").rstrip("/")
     )
+
+    if "-" in parsed_url["aws_account"]:
+        regex_result = re.match(URL_PATTERN, url)
+        if regex_result:
+            regex_result = regex_result.groupdict()
+            parsed_url["code_artifact_domain"] = regex_result["code_artifact_domain"]
+            parsed_url["aws_account"] = regex_result["aws_account"]
 
     return parsed_url
 
