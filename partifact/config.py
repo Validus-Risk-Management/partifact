@@ -17,7 +17,6 @@ URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws
 URL_PATTERN = r"https://(?P<code_artifact_domain>.*)-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
 
 
-
 @dataclass(frozen=True)
 class Configuration:
     """Data for a repository entry in the config file.
@@ -86,13 +85,17 @@ def parse_url(url: str) -> dict:
         raise InvalidConfiguration(
             f"failed to parse source URL, make sure it's in the format of {URL_PATTERN}"
         )
-    
+
     parsed_url = {}
     regex_result = regex_result.groupdict()
     parsed_url["code_artifact_domain"] = regex_result.get("code_artifact_domain")
     parsed_url["aws_account"] = regex_result.get("aws_account")
     parsed_url["aws_region"] = regex_result.get("aws_region")
-    parsed_url["code_artifact_repository"] = regex_result.get("code_artifact_repository", "").replace("simple", "").rstrip("/")
+    parsed_url["code_artifact_repository"] = (
+        regex_result.get("code_artifact_repository", "")
+        .replace("simple", "")
+        .rstrip("/")
+    )
 
     return parsed_url
 
