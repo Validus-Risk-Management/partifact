@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
-from parse import parse
 from tomlkit import parse as parse_toml
 from tomlkit.exceptions import TOMLKitError
 
@@ -15,7 +14,8 @@ URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws
 # (?P<aws_account>\d+): matches the aws_account, allowing one or more digits
 # (?P<aws_region>[a-z0-9-]+): matches the aws_region, allowing lowercase alphanumeric characters and dashes
 # (?P<code_artifact_repository>.*): matches the code_artifact_repository, allowing any character (except a newline)
-URL_PATTERN = r"https://(?P<code_artifact_domain>(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?))-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
+URL_PATTERN = r"https://(?P<code_artifact_domain>.*)-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
+
 
 
 @dataclass(frozen=True)
@@ -81,23 +81,18 @@ class Configuration:
 
 def parse_url(url: str) -> dict:
     """Parses the URL into a mapping of parameter names to values."""
-    result = parse(URL_TEMPLATE, url)
-    if not result:
+    regex_result = re.match(URL_PATTERN, url)
+    if not regex_result:
         raise InvalidConfiguration(
-            f"failed to parse source URL, make sure it's in the format of {URL_TEMPLATE}"
+            f"failed to parse source URL, make sure it's in the format of {URL_PATTERN}"
         )
-
-    parsed_url = result.named
-    parsed_url["code_artifact_repository"] = (
-        parsed_url["code_artifact_repository"].replace("simple", "").rstrip("/")
-    )
-
-    if "-" in parsed_url["aws_account"]:
-        regex_result = re.match(URL_PATTERN, url)
-        if regex_result:
-            regex_result = regex_result.groupdict()
-            parsed_url["code_artifact_domain"] = regex_result["code_artifact_domain"]
-            parsed_url["aws_account"] = regex_result["aws_account"]
+    
+    parsed_url = {}
+    regex_result = regex_result.groupdict()
+    parsed_url["code_artifact_domain"] = regex_result.get("code_artifact_domain")
+    parsed_url["aws_account"] = regex_result.get("aws_account")
+    parsed_url["aws_region"] = regex_result.get("aws_region")
+    parsed_url["code_artifact_repository"] = regex_result.get("code_artifact_repository", "").replace("simple", "").rstrip("/")
 
     return parsed_url
 
