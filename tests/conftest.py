@@ -3,7 +3,9 @@ from dataclasses import asdict
 import pytest
 import tomlkit
 
-from partifact.config import CONFIG_PATH, URL_TEMPLATE, Configuration
+from partifact.config import CONFIG_PATH, Configuration
+
+URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
 
 
 @pytest.fixture()
