@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Optional
 
-from parse import parse
 from tomlkit import parse as parse_toml
 from tomlkit.exceptions import TOMLKitError
 
 CONFIG_PATH = "./pyproject.toml"
 URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
+URL_PATTERN = r"https://(?P<code_artifact_domain>.*)-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
 
 
 @dataclass(frozen=True)
@@ -74,15 +75,21 @@ class Configuration:
 
 def parse_url(url: str) -> dict:
     """Parses the URL into a mapping of parameter names to values."""
-    result = parse(URL_TEMPLATE, url)
-    if not result:
+    regex_result = re.match(URL_PATTERN, url)
+    if not regex_result:
         raise InvalidConfiguration(
-            f"failed to parse source URL, make sure it's in the format of {URL_TEMPLATE}"
+            f"failed to parse source URL, make sure it's in the format of {URL_PATTERN}"
         )
 
-    parsed_url = result.named
+    parsed_url = {}
+    regex_result = regex_result.groupdict()
+    parsed_url["code_artifact_domain"] = regex_result.get("code_artifact_domain")
+    parsed_url["aws_account"] = regex_result.get("aws_account")
+    parsed_url["aws_region"] = regex_result.get("aws_region")
     parsed_url["code_artifact_repository"] = (
-        parsed_url["code_artifact_repository"].replace("simple", "").rstrip("/")
+        regex_result.get("code_artifact_repository", "")
+        .replace("simple", "")
+        .rstrip("/")
     )
 
     return parsed_url

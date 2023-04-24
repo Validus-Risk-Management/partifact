@@ -98,3 +98,19 @@ def test_parse_url(url):
         "aws_region": "eu-west-1",
     }
     assert actual == expected
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://test-domain-123456789.d.codeartifact.eu-west-1.amazonaws.com/pypi/test_ca_repo/simple/"
+    ],
+)
+def test_parse_url_edgecase(url):
+    actual = parse_url(url)
+    expected = {
+        "code_artifact_domain": "test-domain",
+        "code_artifact_repository": "test_ca_repo",
+        "aws_account": "123456789",
+        "aws_region": "eu-west-1",
+    }
+    assert actual == expected
