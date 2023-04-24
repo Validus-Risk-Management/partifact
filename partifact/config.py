@@ -8,7 +8,6 @@ from tomlkit import parse as parse_toml
 from tomlkit.exceptions import TOMLKitError
 
 CONFIG_PATH = "./pyproject.toml"
-URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
 URL_PATTERN = r"https://(?P<code_artifact_domain>.*)-(?P<aws_account>\d+).d.codeartifact.(?P<aws_region>[a-z0-9-]+).amazonaws.com/pypi/(?P<code_artifact_repository>.*)"
 
 

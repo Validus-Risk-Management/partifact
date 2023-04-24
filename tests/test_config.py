@@ -90,6 +90,7 @@ def test_incorrect_url_format(fs):
     ],
 )
 def test_parse_url(url):
+    """Test that CodeArtifact URLs can be parsed correctly."""
     actual = parse_url(url)
     expected = {
         "code_artifact_domain": "test_domain",
@@ -99,6 +100,7 @@ def test_parse_url(url):
     }
     assert actual == expected
 
+
 @pytest.mark.parametrize(
     "url",
     [
@@ -106,6 +108,7 @@ def test_parse_url(url):
     ],
 )
 def test_parse_url_edgecase(url):
+    """Test that the URL can be parsed correctly even with a dash in the CodeArtifact domain."""
     actual = parse_url(url)
     expected = {
         "code_artifact_domain": "test-domain",
