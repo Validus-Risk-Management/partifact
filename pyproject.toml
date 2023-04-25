@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "partifact"
-version = "0.1.6"
-description = ""
+version = "0.2.0"
+description = "CodeArtifact utilties for Poetry"
 authors = ["David Steiner <david_j_steiner@yahoo.co.nz>"]
 license = "MIT"
 readme = "README.md"
@@ -11,12 +11,12 @@ homepage = "https://github.com/Validus-Risk-Management/partifact"
 partifact = "partifact.main:app"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 boto3 = "^1.15"
 tomlkit = ">=0.7.0,<1.0.0"
-typer = "^0.3.2"
+typer = "^0.7.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 flake8 = "^3.9.0"
 flake8-absolute-import = "^1.0"
@@ -38,8 +38,9 @@ mypy = "^0.910"
 pep8-naming = "^0.12.1"
 pre-commit = "^2.14.0"
 pyfakefs = "^4.5.0"
-pytest = "^6.2.4"
+pytest = "^7.2.0"
 pytest-mock = "^3.6.1"
+pytest-cov = "^4.0.0"
 
 [tool.mypy]
 ignore_missing_imports = true

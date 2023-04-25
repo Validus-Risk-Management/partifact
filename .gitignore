@@ -1,22 +1,13 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-.Python
+.idea/
+.venv/
 build/
-develop-eggs/
 dist/
 
-.pytest_cache/
+*.egg-info/
+__pycache__/
 
-__pypackages__/
-
-.venv
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-.idea/
+*.py[cod]
+*.egg
+.coverage
+coverage.xml
+.mypy_cache
