@@ -1,0 +1,34 @@
+name: Lint & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.8, 3.9, "3.10" ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2
+      with:
+        poetry-version: 1.4
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Run pre-commit checks
+      run: |
+        poetry run pre-commit run --all
+    - name: Run pytest
+      run: |
+        poetry run pytest --cov partifact --cov-report term-missing --cov-report xml
