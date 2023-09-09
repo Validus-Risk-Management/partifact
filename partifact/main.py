@@ -1,6 +1,7 @@
 from typing import Optional
 
 import typer
+from typing_extensions import Annotated
 
 from partifact.auth_token import get_token
 from partifact.config import Configuration
@@ -9,19 +10,28 @@ from partifact.shell_commands import configure_pip, configure_poetry
 app = typer.Typer()
 
 profile_option = typer.Option(
-    None, help="The AWS profile to use when getting the CodeArtifact token."
+    "--profile",
+    "-p",
+    help="The AWS profile to use when getting the CodeArtifact token.",
 )
 
 role_option = typer.Option(
-    None, help="The AWS role to use when getting the CodeArtifact token."
+    "--role", "-r", help="The AWS role to use when getting the CodeArtifact token."
+)
+
+should_configure_pip_option = typer.Option(
+    "--configure-pip",
+    "-c",
+    help="Set global.index-url for pip in addition to configuring poetry.",
 )
 
 
 @app.command()
 def login(
     repository: str,
-    profile: Optional[str] = profile_option,
-    role: Optional[str] = role_option,
+    profile: Annotated[Optional[str], profile_option] = None,
+    role: Annotated[Optional[str], role_option] = None,
+    should_configure_pip: Annotated[bool, should_configure_pip_option] = False,
 ) -> None:
     """Log into CodeArtifact.
 
@@ -30,7 +40,8 @@ def login(
     config = Configuration.load(repository, profile, role)
     token = get_token(config)
 
-    configure_pip(config, token)
+    if should_configure_pip:
+        configure_pip(config, token)
     configure_poetry(repository, token)
 
 

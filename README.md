@@ -50,6 +50,13 @@ partifact login myrepo --profile myprofile
 partifact login myrepo --role myrole
 ```
 
+If you would also like to configure `global.index-url` in the `pip` config,
+you can do so through the `--configure-pip` flag.
+
+```shell
+partifact login myrepo --profile myprofile --configure-pip
+```
+
 # Known issues
 
 1. The `CodeArtifact` token seems to exceed the maximum length allowed in Windows Credential Manager, resulting
