@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "partifact"
-version = "0.2.0"
+version = "0.3.0"
 description = "CodeArtifact utilties for Poetry"
 authors = ["David Steiner <david_j_steiner@yahoo.co.nz>"]
 license = "MIT"
@@ -14,7 +14,7 @@ partifact = "partifact.main:app"
 python = "^3.8"
 boto3 = "^1.15"
 tomlkit = ">=0.7.0,<1.0.0"
-typer = "^0.7.0"
+typer = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

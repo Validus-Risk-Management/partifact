@@ -86,7 +86,7 @@ def test_login_command_configures_pip(
     subprocess_mock: Mock, load_config_mock: Mock, token_mock: Mock
 ):
     """Tests that expected shell command is invoked to configure pip."""
-    result = runner.invoke(app, ["login", "whatever"])
+    result = runner.invoke(app, ["login", "whatever", "--configure-pip"])
     assert result.exit_code == 0
 
     config: Configuration = load_config_mock.return_value
@@ -118,6 +118,6 @@ def test_login_command_configures_poetry(subprocess_mock: Mock, token_mock: Mock
         "aws",
         token_mock.return_value,
     ]
-    subprocess_mock.assert_any_call(
+    subprocess_mock.assert_called_once_with(
         expected_poetry_command, capture_output=True, text=True, check=True
     )
