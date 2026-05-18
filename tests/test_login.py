@@ -9,7 +9,7 @@ from partifact.main import app
 runner = CliRunner()
 
 
-@pytest.fixture()
+@pytest.fixture
 def load_config_mock(mocker) -> Mock:
     """Patches the load method of Configuration."""
     test_config = Configuration(
@@ -24,7 +24,7 @@ def load_config_mock(mocker) -> Mock:
     return load_mock
 
 
-@pytest.fixture()
+@pytest.fixture
 def token_mock(mocker):
     """Patches token generation."""
     test_token = "TEST_TOKEN"
