@@ -6,6 +6,13 @@ authors = ["David Steiner <david_j_steiner@yahoo.co.nz>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/Validus-Risk-Management/partifact"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Programming Language :: Python :: 3.14",
+]
 
 [tool.poetry.scripts]
 partifact = "partifact.main:app"
