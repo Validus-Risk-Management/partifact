@@ -8,7 +8,7 @@ from partifact.config import CONFIG_PATH, Configuration
 URL_TEMPLATE = "https://{code_artifact_domain}-{aws_account}.d.codeartifact.{aws_region}.amazonaws.com/pypi/{code_artifact_repository}"
 
 
-@pytest.fixture()
+@pytest.fixture
 def write_conf(fs):
     """Fixture to write a configuration entry."""
 
@@ -23,7 +23,7 @@ def write_conf(fs):
     return _write
 
 
-@pytest.fixture()
+@pytest.fixture
 def add_conf(write_conf):
     """Fixture to add a test configuration entry."""
 
@@ -97,7 +97,9 @@ class MockSTSClient:
         self.aws = aws
 
     def assume_role(
-        self, RoleArn=None, RoleSessionName=None  # noqa : boto3 argument naminge
+        self,
+        RoleArn=None,  # noqa: N803
+        RoleSessionName=None,  # noqa: N803
     ):
         """Mimicking boto3.client('sts')."""
         self.aws.register_role(RoleArn)
@@ -116,13 +118,15 @@ class MockCodeArtifactClient:
         self.aws = aws
 
     def get_authorization_token(
-        self, domain=None, domainOwner=None  # noqa : boto3 argument naminge
+        self,
+        domain=None,
+        domainOwner=None,  # noqa: N803
     ):
         """Mimicking boto3.client('codeartifact')."""
         return self.aws._get_authorization_token(domain, domainOwner)
 
 
-@pytest.fixture()
+@pytest.fixture
 def aws(mocker):
     """Swaps boto3 with a dummy implementation."""
     dummy_aws = DummyAWS()
@@ -131,7 +135,7 @@ def aws(mocker):
     return dummy_aws
 
 
-@pytest.fixture()
+@pytest.fixture
 def subprocess_mock(mocker):
     """Patches subprocess.run so that it does not execute anything."""
     mock = mocker.patch("subprocess.run")
