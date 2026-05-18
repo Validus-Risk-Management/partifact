@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "partifact"
-version = "0.4.0"
+version = "0.5.0"
 description = "CodeArtifact utilties for Poetry"
 authors = ["David Steiner <david_j_steiner@yahoo.co.nz>"]
 license = "MIT"
